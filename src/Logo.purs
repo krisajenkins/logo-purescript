@@ -1,13 +1,15 @@
 module Logo where
 
 import Prelude
-import Control.Monad.RWS (RWS, get, put, tell)
+import Control.Monad.RWS (RWS, tell)
+import Data.Lens (assign, lens, modifying, use)
+import Data.Lens.Types (Lens')
 import Math (Radians, cos, pi, sin)
 
 type TurtleM = RWS Unit (Array Tag) Turtle
 
 initialTurtle :: Turtle
-initialTurtle =
+initialTurtle = Turtle
   { angle: 0.0
   , position: Position { x: 0.0, y: 0.0 }
   }
@@ -17,11 +19,28 @@ newtype Position = Position
   , y :: Number
   }
 
-instance positionShow :: Show Position where
-  show (Position {x, y}) =
-    "(" <> show x <> "," <> show y <> ")"
+_x :: Lens' Position Number
+_x = lens get set
+  where get (Position {x}) = x
+        set (Position position) x = Position $ position {x = x}
 
-type Turtle =
+_y :: Lens' Position Number
+_y = lens get set
+  where get (Position {y}) = y
+        set (Position position) y = Position $ position {y = y}
+
+_position :: Lens' Turtle Position
+_position = lens get set
+  where get (Turtle {position}) = position
+        set (Turtle turtle) position = Turtle $ turtle {position = position}
+
+
+_angle :: Lens' Turtle Radians
+_angle = lens get set
+  where get (Turtle {angle}) = angle
+        set (Turtle turtle) angle = Turtle $ turtle {angle = angle}
+
+data Turtle = Turtle
   { angle :: Radians
   , position :: Position
   }
@@ -30,20 +49,21 @@ data Tag = Line Position Position
 
 forward :: Number -> TurtleM Unit
 forward n = do
-  startTurtle <- get
-  let startPosition = startTurtle.position
-  let angle = startTurtle.angle
-  let endPosition = move angle n startPosition
-  put $ startTurtle { position = endPosition }
+  startPosition <- use _position
+  startAngle <- use _angle
+  let endPosition = move n startAngle startPosition
+  assign _position endPosition
   tell [ Line startPosition endPosition ]
   pure unit
 
 right :: Degrees -> TurtleM Unit
 right delta = do
-  startTurtle <- get
-  let angle = startTurtle.angle
-  let newAngle = angle + (degreesToRadians delta)
-  put $ startTurtle { angle = newAngle }
+  modifying _angle ((+) (degreesToRadians delta))
+  pure unit
+
+left :: Degrees -> TurtleM Unit
+left delta = do
+  modifying _angle ((-) (degreesToRadians delta))
   pure unit
 
 type Degrees = Number
@@ -52,8 +72,8 @@ degreesToRadians :: Degrees -> Radians
 degreesToRadians =
   (*) (pi / 180.0)
 
-move :: Radians -> Number -> Position -> Position
-move angle distance (Position {x, y}) =
+move :: Number -> Radians -> Position -> Position
+move distance angle (Position {x, y}) =
   Position { x: x + newX, y: y + newY }
   where
     newX = cos angle * distance
