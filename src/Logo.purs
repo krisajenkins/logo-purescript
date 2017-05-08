@@ -2,7 +2,7 @@ module Logo where
 
 import Prelude
 import Control.Monad.RWS (RWS, get, put, tell)
-import Math (Radians, cos, sin)
+import Math (Radians, atan2, cos, pi, sin, tan)
 
 type TurtleM = RWS Unit (Array Tag) Turtle
 
@@ -26,7 +26,7 @@ type Turtle =
   , position :: Position
   }
 
-type Tag = String
+data Tag = Line Position Position
 
 forward :: Number -> TurtleM Unit
 forward n = do
@@ -35,28 +35,26 @@ forward n = do
   let angle = startTurtle.angle
   let endPosition = move angle n startPosition
   put $ startTurtle { position = endPosition }
-  tell [ "From " <> show startPosition <> " -> " <> show endPosition ]
+  tell [ Line startPosition endPosition ]
   pure unit
 
-right :: Radians -> TurtleM Unit
+right :: Degrees -> TurtleM Unit
 right delta = do
   startTurtle <- get
   let angle = startTurtle.angle
-  let newAngle = angle + delta
+  let newAngle = angle + (degreesToRadians delta)
   put $ startTurtle { angle = newAngle }
   pure unit
 
+type Degrees = Number
+
+degreesToRadians :: Degrees -> Radians
+degreesToRadians =
+  (*) (pi / 180.0)
+
 move :: Radians -> Number -> Position -> Position
 move angle distance (Position {x, y}) =
-  Position { x: newX, y: newY }
+  Position { x: x + newX, y: y + newY }
   where
     newX = cos angle * distance
     newY = sin angle * distance
-
-drawing1 :: TurtleM Unit
-drawing1 = do
-  forward 100.0
-  right 90.0
-  forward 100.0
-  right 135.0
-  forward 50.0
