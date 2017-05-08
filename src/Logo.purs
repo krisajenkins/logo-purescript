@@ -2,7 +2,7 @@ module Logo where
 
 import Prelude
 import Control.Monad.RWS (RWS, get, put, tell)
-import Math (Radians, atan2, cos, pi, sin, tan)
+import Math (Radians, cos, pi, sin)
 
 type TurtleM = RWS Unit (Array Tag) Turtle
 

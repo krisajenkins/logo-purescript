@@ -1,25 +1,22 @@
 module Main where
 
-import Control.Safely (replicateM_)
 import Prelude
-import Halogen.Component
+import Halogen.Component (Component, ComponentDSL, ComponentHTML, component)
 import Control.Monad.Aff (Aff)
 import Control.Monad.Aff.AVar (AVAR)
 import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Console (CONSOLE, log)
+import Control.Monad.Eff.Console (CONSOLE)
 import Control.Monad.Eff.Exception (EXCEPTION)
 import Control.Monad.Eff.Ref (REF)
 import Control.Monad.RWS (RWSResult(..), runRWS)
+import Control.Safely (replicateM_)
 import DOM (DOM)
-import Data.Array (intercalate)
 import Data.Maybe (Maybe(..))
-import Halogen (AttrName(..))
 import Halogen.Aff (awaitBody, runHalogenAff)
-import Halogen.Aff.Effects (HalogenEffects)
-import Halogen.HTML (HTML(..), div_, h1_, text)
-import Halogen.HTML.Core (ElemName(..), Namespace(..), attr, element)
+import Halogen.HTML (HTML, div_, h1_, text)
 import Halogen.VDom.Driver (runUI)
 import Logo (Position(..), Tag(..), TurtleM, forward, initialTurtle, right)
+import Svg (height, line, stroke, strokeWidth, svg, viewBox, width, x1, x2, y1, y2)
 
 main :: forall eff. Eff (console :: CONSOLE, avar :: AVAR, dom :: DOM, exception :: EXCEPTION, ref :: REF | eff) Unit
 main = runHalogenAff do
@@ -69,21 +66,6 @@ render state =
            , stroke "black"
            ]
            []
-
-svgNamespace = Just $ Namespace "http://www.w3.org/2000/svg"
-
-svg = element svgNamespace (ElemName "svg")
-line = element svgNamespace (ElemName "line")
-
-viewBox = attr Nothing (AttrName "viewBox")
-width = show >>> attr Nothing (AttrName "width")
-height = show >>> attr Nothing (AttrName "height")
-x1 = show >>> attr Nothing (AttrName "x1")
-y1 = show >>> attr Nothing (AttrName "y1")
-x2 = show >>> attr Nothing (AttrName "x2")
-y2 = show >>> attr Nothing (AttrName "y2")
-strokeWidth = show >>> attr Nothing (AttrName "stroke-width")
-stroke = attr Nothing (AttrName "stroke")
 
 drawing1 :: TurtleM Unit
 drawing1 = replicateM_ 6 $ do
