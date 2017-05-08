@@ -6,7 +6,14 @@ import Data.Lens (assign, lens, modifying, use)
 import Data.Lens.Types (Lens')
 import Math (Radians, cos, pi, sin)
 
-type TurtleM = RWS Unit (Array Tag) Turtle
+data Turtle = Turtle
+  { angle :: Radians
+  , position :: Position
+  }
+
+data Action = Line Position Position
+
+type TurtleM = RWS Unit (Array Action) Turtle
 
 initialTurtle :: Turtle
 initialTurtle = Turtle
@@ -39,13 +46,6 @@ _angle :: Lens' Turtle Radians
 _angle = lens get set
   where get (Turtle {angle}) = angle
         set (Turtle turtle) angle = Turtle $ turtle {angle = angle}
-
-data Turtle = Turtle
-  { angle :: Radians
-  , position :: Position
-  }
-
-data Tag = Line Position Position
 
 forward :: Number -> TurtleM Unit
 forward n = do

@@ -15,7 +15,7 @@ import Data.Maybe (Maybe(..))
 import Halogen.Aff (awaitBody, runHalogenAff)
 import Halogen.HTML (HTML, div_, h1_, text)
 import Halogen.VDom.Driver (runUI)
-import Logo (Position(..), Tag(..), TurtleM, forward, initialTurtle, right)
+import Logo (Position(..), Action(..), TurtleM, forward, initialTurtle, right)
 import Svg (height, line, stroke, strokeWidth, svg, viewBox, width, x1, x2, y1, y2)
 
 main :: forall eff. Eff (console :: CONSOLE, avar :: AVAR, dom :: DOM, exception :: EXCEPTION, ref :: REF | eff) Unit
@@ -56,7 +56,7 @@ render state =
     (RWSResult state result writer) = runRWS drawing1 unit initialTurtle
     drawing1Group :: forall p i. Array (HTML p i)
     drawing1Group = map toSvgTag writer
-    toSvgTag :: forall p i. Tag -> HTML p i
+    toSvgTag :: forall p i. Action -> HTML p i
     toSvgTag (Line (Position from) (Position to)) =
       line [ x1 from.x
            , y1 from.y
