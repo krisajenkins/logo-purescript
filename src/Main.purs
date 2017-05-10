@@ -71,6 +71,9 @@ toSvgTag (Line (Position from) (Position to)) =
        ]
        []
 
+------------------------------------------------------------
+-- The Drawing.
+------------------------------------------------------------
 drawing1 :: forall m. Monad m => TurtleT m Unit
 drawing1 = replicateM_ 6 $ do
   turnRight 60.0
