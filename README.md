@@ -1,6 +1,6 @@
 # Logo
 
-A PureScript free monad for the Logo programming languages.
+A PureScript free monad hack of the Logo programming languages.
 
 Written for May 2017's [West London Hack Night](http://www.meetup.com/West-London-Hack-Night/).
 
